@@ -1,5 +1,9 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
+const beginningHTML = require("./templates/beginning");
+const endHTML = require("./templates/end");
+
+
 const employee = require("./lib/Employee");
 const manager = require("./lib/Manager");
 const intern = require("./lib/Intern");
@@ -114,15 +118,26 @@ function teamPrompt() {
         },
     ]).then(function (response) {
         teamName = response.team;
-        console.log("generate HTML");
-        console.log(teamName);
-        console.log(employeeInfo);
-        // generateHTML();
+        generateHTML();
     })
 };
 
 
-// array to create all the employers of one role
+// *** APPEND ALL ELEMENTS OF FINAL HTML ***
+const generateHTML = () => {
+    let beginnningOutput = beginningHTML(teamName);
+    fs.appendFile(`./output/${teamName}.html`, beginnningOutput, function (err) {
+        if (err) throw err;
+        console.log("beginningOutput complete");
+    });
+    let endOutput = endHTML();
+    fs.appendFile(`./output/${teamName}.html`, endOutput, function(err) {
+        if (err) throw err;
+        console.log("endOutput complete");
+    })
+}
+
+// // array to create all the employers of one role
 // let managersArray = {
 //     name: 'ddd',
 //     id: 'ddddd',
@@ -140,10 +155,6 @@ function teamPrompt() {
 
 
 
-
-// QUESTIONS:
-// how to ensure the email address will be in the correct format in the middle of the prompt?
-// inquirer when?
 
 // TO DO:
 // in generated HTML:
