@@ -10,6 +10,9 @@ const intern = require("./lib/Intern");
 const engineer = require("./lib/Engineer");
 const managers = require("./templates/manager");
 
+const test = [];
+console.log(test[0]);
+
 console.log("Please select the members of your team")
 
 // variables store responses from prompt
@@ -19,6 +22,8 @@ let teamName;
 // type of information that will be required of each role
 let info;
 
+// var to check check whether a manager has been chosen or not
+let managerDone = false;
 
 // *** PROMPT TO SELECT ROLE OF EMPLOYEE ***
 function rolePrompt() {
@@ -32,11 +37,12 @@ function rolePrompt() {
                 "Engineer",
                 "Intern",
                 "All employees have been selected"
-            ]
+            ],
         }
     ]).then(function (response) {
         role = response.role;
         if (response.role === "Manager") {
+            managerDone = true;
             role = "manager";
             info = "office number";
             infoPrompt();
@@ -78,16 +84,28 @@ function infoPrompt() {
         }
     };
 
+    // answer validation function
+    const answerValidation = (input) => {
+        if (input === "") {
+            return "Please enter a valid answer";
+        }
+        else {
+            return true;
+        }
+    }
+
     inquirer.prompt([
         {
             type: "input",
             message: `What is the ${role}'s name?`,
-            name: "name"
+            name: "name",
+            validate: answerValidation
         },
         {
             type: "input",
             message: `What is the ${role}'s id?`,
-            name: "id"
+            name: "id",
+            validate: answerValidation
         },
         {
             type: "input",
@@ -98,7 +116,8 @@ function infoPrompt() {
         {
             type: "input",
             message: `What is the ${role}'s ${info}?`,
-            name: "information"
+            name: "information",
+            validate: answerValidation
         }
     ]).then(function (response) {
         employeeInfo = response;
@@ -110,11 +129,22 @@ function infoPrompt() {
 
 // *** PROMPT TO ENTER TEAM NAME ***
 function teamPrompt() {
+    // answer validation function
+    const answerValidation = (input) => {
+        if (input === "") {
+            return "Please enter a valid answer";
+        }
+        else {
+            return true;
+        }
+    }
+
     inquirer.prompt([
         {
             type: "input",
             message: "What's the name of the team?",
-            name: "team"
+            name: "team",
+            validate: answerValidation
         },
     ]).then(function (response) {
         teamName = response.team;
@@ -131,7 +161,7 @@ const generateHTML = () => {
         console.log("beginningOutput complete");
     });
     let endOutput = endHTML();
-    fs.appendFile(`./output/${teamName}.html`, endOutput, function(err) {
+    fs.appendFile(`./output/${teamName}.html`, endOutput, function (err) {
         if (err) throw err;
         console.log("endOutput complete");
     })
@@ -157,7 +187,9 @@ const generateHTML = () => {
 
 
 // TO DO:
+
 // in generated HTML:
+//      if (internArr[0]) {} use to determine if the row needs to be created and appended,
 //     create cards for each position ()
 //     mailto: for email addressses
 //     Github is connected to the person's page
