@@ -4,18 +4,24 @@ const employee = require("./lib/Employee");
 const manager = require("./lib/Manager");
 const intern = require("./lib/Intern");
 const engineer = require("./lib/Engineer");
+const managers = require("./templates/manager");
 
 console.log("Please select the members of your team")
 
-// variable will determine the index of choice (role) selected
-let role = "";
-let info = "";
+// variables store responses from prompt
+let role;
+let employeeInfo;
+let teamName;
+// type of information that will be required of each role
+let info;
 
+
+// *** PROMPT TO SELECT ROLE OF EMPLOYEE ***
 function rolePrompt() {
     inquirer.prompt([
         {
             type: "list",
-            message: "Select the type of employee:",
+            message: "Select the role you wish to enter:",
             name: "role",
             choices: [
                 "Manager",
@@ -25,44 +31,49 @@ function rolePrompt() {
             ]
         }
     ]).then(function (response) {
+        role = response.role;
         if (response.role === "Manager") {
             role = "manager";
             info = "office number";
-            promptInfo();
+            infoPrompt();
         }
         else if (response.role === "Engineer") {
             role = "engineer";
             info = "Github username";
-            promptInfo();
+            infoPrompt();
         }
         else if (response.role === "Intern") {
             role = "intern";
             info = "school";
-            promptInfo();
+            infoPrompt();
         }
         else {
-            console.log("generate HTML");
-            // generateHTML();
+            teamPrompt();
         }
-
     })
 }
 rolePrompt();
 
 
-const choice = {
-    manager: {
-        extra: "office number"
-    },
-    engineer: {
-        extra: "github username"
-    },
-    intern: {
-        extra: "school"
-    }
-};
+// *** PROMPT TO ENTER INFORMATION OF EMPLOYEE ***
+function infoPrompt() {
+    // email validation function
+    const emailValidation = (email) => {
+        let emailArr = email.split("");
+        const characterAt = (emailArr) => {
+            return emailArr === "@";
+        };
+        const characterDot = (emailArr) => {
+            return emailArr === ".";
+        };
+        if (emailArr.some(characterAt) && emailArr.some(characterDot)) {
+            return true;
+        }
+        else {
+            return "Please enter a valid email address";
+        }
+    };
 
-function promptInfo() {
     inquirer.prompt([
         {
             type: "input",
@@ -71,31 +82,74 @@ function promptInfo() {
         },
         {
             type: "input",
-            message: `What is the ${role}'s email address?`,
-            name: "email"
+            message: `What is the ${role}'s id?`,
+            name: "id"
         },
         {
             type: "input",
-            message: `What is the ${role}'s ${choice.role.extra}?`,
-            name: "supplementalInfo"
+            message: `What is the ${role}'s email address?`,
+            name: "email",
+            validate: emailValidation
+        },
+        {
+            type: "input",
+            message: `What is the ${role}'s ${info}?`,
+            name: "information"
         }
-    ]).then(function(response) {
-        console.log(response);
+    ]).then(function (response) {
+        employeeInfo = response;
+        employeeInfo.role = role;
+        rolePrompt();
     })
 }
 
 
+// *** PROMPT TO ENTER TEAM NAME ***
+function teamPrompt() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What's the name of the team?",
+            name: "team"
+        },
+    ]).then(function (response) {
+        teamName = response.team;
+        console.log("generate HTML");
+        console.log(teamName);
+        console.log(employeeInfo);
+        // generateHTML();
+    })
+};
+
+
+// array to create all the employers of one role
+// let managersArray = {
+//     name: 'ddd',
+//     id: 'ddddd',
+//     email: 'ddddddd',
+//     information: 'fffff',
+//     role: 'engineer'
+// };
+// let managerTemplate = managers(managersArray);
+// fs.appendFile("output.html", managerTemplate, function (err) {
+//     if (err) throw err;
+//     console.log("complete")
+// })
+
+// // fs.appendFile for every item in the array (loop/map)
 
 
 
 
+// QUESTIONS:
+// how to ensure the email address will be in the correct format in the middle of the prompt?
+// inquirer when?
 
-// // manager
-// <i class="fas fa-users"></i>
-// // engineer
-// <i class="fas fa-user-cog"></i>
-// // intern
-// <i class="fas fa-user-graduate"></i>
-
-
-
+// TO DO:
+// in generated HTML:
+//     create cards for each position ()
+//     mailto: for email addressses
+//     Github is connected to the person's page
+//     is there a Google search API (for the school link)
+// in app.js:
+// warning if more than one manager has been selected (allow only one)
