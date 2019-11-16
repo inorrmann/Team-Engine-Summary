@@ -1,4 +1,4 @@
-var beginningHTML = (teamName) => {
+const beginningHTML = (teamName) => {
     return `<!DOCTYPE html>
 <html lang="en">
 
@@ -31,6 +31,26 @@ var beginningHTML = (teamName) => {
 <div class="container">`
 }
 
-module.exports = beginningHTML;
+
+const endHTML = () => {
+    return `</div>
+    </body>
+    </html>`
+}
+
+const rowBeginningHTML = () => {
+    `<div class="row d-flex justify-content-center py-4">`
+}
+
+const rowEndHTML = () => {
+    ` </div>`
+}
+
+module.exports = {
+    beginningHTML: beginningHTML,
+    endHTML: endHTML,
+    rowBeginningHTML: rowBeginningHTML,
+    rowEndHTML: rowEndHTML
+}
 
 
