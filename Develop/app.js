@@ -2,9 +2,8 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const mainHTML = require("./templates/main");
 const manager = require("./lib/Manager");
-
-const intern = require("./lib/Intern");
 const engineer = require("./lib/Engineer");
+const intern = require("./lib/Intern");
 
 
 // variables store responses from prompts
@@ -17,6 +16,10 @@ let internArr = [];
 
 // type of information that will be required of each role
 let info;
+
+// var to concatenate and push the output to generate HTML file
+let output = [];
+
 
 // print to console to begin selection
 console.log("Please select the members of your team")
@@ -50,7 +53,7 @@ const answerValidation = (input) => {
 }
 
 
-// *** PROMPT TO INPUT MANAGER'S INFO***
+// *** PROMPT TO INPUT MANAGER'S INFO ***
 inquirer.prompt([
     {
         type: "input",
@@ -147,6 +150,8 @@ function infoPrompt() {
         // create arrays of types of employees
         if (role === "engineer") {
             engineerArr.push(employeeInfo);
+            console.log(engineerArr);
+
         }
         if (role === "intern") {
             internArr.push(employeeInfo);
@@ -169,51 +174,53 @@ function teamPrompt() {
     ]).then(function (response) {
         teamName = response.team;
         generateHTML();
+        console.log(output);
     })
 };
 
 
 // *** APPEND ALL ELEMENTS OF FINAL HTML ***
-const generateHTML = () => {
-   
-        // top of the HTML
-        let beginnningOutput = mainHTML.beginningHTML(teamName);
-        fs.appendFile(`./output/${teamName}.html`, beginnningOutput, function (err) {
-            if (err) throw err;
-            console.log("beginningOutput complete");
-        });
-        
-        // manager HTML
-        let managerOutput = manager.managerHTML(managerArr);
-        fs.appendFile(`./output/${teamName}.html`, managerOutput, function(err) {
-            if (err) throw err;
-            console.log("managerOutput complete");
-        });
+const generateHTML = async () => {
 
-        // bottom of the HTML
-        let endOutput = mainHTML.endHTML();
-        fs.appendFile(`./output/${teamName}.html`, endOutput, function (err) {
-            if (err) throw err;
-            console.log("endOutput complete");
-        });
+    // top of the HTML
+    let beginnningOutput = mainHTML.beginningHTML(teamName);
+    // manager HTML
+    let managerOutput = manager.managerHTML(managerArr);
+    let engineerOutput = "";
+    let internOutput = "";
+    // beginning and end of rows for engineers & interns
+    let rowBeginningOutput = mainHTML.rowBeginningHTML();
+    let rowEndOutput = mainHTML.rowEndHTML();
+    // bottom of the HTML
+    let endOutput = mainHTML.endHTML();
 
+    // engineer HTML
+    if (engineerArr[0]) {
+        let engineerStr = "";
+        for (i = 0; i < engineerArr.length; i++) {
+            let engineersHTML = engineer.engineerHTML(engineerArr, i);
+            engineerStr += engineersHTML;
+            console.log(engineerStr);
+        }
+        engineerOutput = rowBeginningOutput.concat(engineerStr + rowEndOutput);
+    }
 
-        
+    // intren HTML
+    if (internArr[0]) {
+        let internStr = "";
+        for (j = 0; j < internArr.length; j++) {
+            let internsHTML = intern.internHTML(internArr, j);
+            internStr += internsHTML;
+            console.log(internStr);
+        }
+        internOutput = rowBeginningOutput.concat(internStr + rowEndOutput);
+    }
+
+    // concatenate all parts of the final HTML and push to output var
+    await output.push(beginnningOutput + managerOutput + engineerOutput + internOutput + endOutput);
+
+    await fs.appendFile(`./output/${teamName}.html`, output, function (err) {
+        if (err) throw err;
+        console.log("HTML complete");
+    })
 }
-
-
-// // fs.appendFile for every item in the array (loop/map)
-
-
-
-
-// TO DO:
-
-// in generated HTML:
-//      if (internArr[0]) {} use to determine if the row needs to be created and appended,
-//     create cards for each position ()
-//     mailto: for email addressses
-//     Github is connected to the person's page
-//     is there a Google search API (for the school link)
-// in app.js:
-// warning if more than one manager has been selected (allow only one)
