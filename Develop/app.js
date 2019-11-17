@@ -25,7 +25,7 @@ let output = [];
 console.log("Please select the members of your team")
 
 
-// *** PROMPT VALIDATION FUNCTIONS ***
+// *** VALIDATION FUNCTIONS FOR PROMPTS ***
 
 const emailValidation = (email) => {
     let emailArr = email.split("");
@@ -54,6 +54,7 @@ const answerValidation = (input) => {
 
 
 // *** PROMPT TO INPUT MANAGER'S INFO ***
+// prompt will print automatically after initial message
 inquirer.prompt([
     {
         type: "input",
@@ -81,7 +82,7 @@ inquirer.prompt([
     }
 ]).then(function (response) {
     managerArr = response;
-    console.log(managerArr);
+    // call prompt to select role of employees
     rolePrompt();
 });
 
@@ -100,9 +101,12 @@ function rolePrompt() {
             ],
         }
     ]).then(function (response) {
+        // depending on role selected save variables
+        // to populate employees' cards
         if (response.role === "Engineer") {
             role = "engineer";
             info = "Github username";
+            // call prompt to input employee's info
             infoPrompt();
         }
         else if (response.role === "Intern") {
@@ -110,6 +114,8 @@ function rolePrompt() {
             info = "school";
             infoPrompt();
         }
+        // if all employees have been entered, call
+        // prompt to input team's name
         else {
             teamPrompt();
         }
@@ -117,7 +123,7 @@ function rolePrompt() {
 };
 
 
-// *** PROMPT TO ENTER INFORMATION OF EMPLOYEE ***
+// *** PROMPT TO INPUT EMPLOYEES' INFO ***
 function infoPrompt() {
     inquirer.prompt([
         {
@@ -147,16 +153,14 @@ function infoPrompt() {
     ]).then(function (response) {
         employeeInfo = response;
 
-        // create arrays of types of employees
+        // create arrays based on employees' roles
         if (role === "engineer") {
             engineerArr.push(employeeInfo);
-            console.log(engineerArr);
-
         }
         if (role === "intern") {
             internArr.push(employeeInfo);
         }
-
+        // call prompt to select role of new employee
         rolePrompt();
     })
 }
@@ -173,53 +177,54 @@ function teamPrompt() {
         },
     ]).then(function (response) {
         teamName = response.team;
+        // call function to generate HTML will all elements from the prompts
         generateHTML();
-        console.log(output);
     })
 };
 
 
-// *** APPEND ALL ELEMENTS OF FINAL HTML ***
+// *** CREATE FINAL HTML ***
 const generateHTML = async () => {
 
-    // top of the HTML
+    // top of HTML
     let beginnningOutput = mainHTML.beginningHTML(teamName);
     // manager HTML
     let managerOutput = manager.managerHTML(managerArr);
     let engineerOutput = "";
     let internOutput = "";
-    // beginning and end of rows for engineers & interns
+    // beginning & end of rows for engineers & interns
     let rowBeginningOutput = mainHTML.rowBeginningHTML();
     let rowEndOutput = mainHTML.rowEndHTML();
-    // bottom of the HTML
+    // bottom of HTML
     let endOutput = mainHTML.endHTML();
 
-    // engineer HTML
+    // engineer HTML, create output if array has at least one element
     if (engineerArr[0]) {
         let engineerStr = "";
         for (i = 0; i < engineerArr.length; i++) {
             let engineersHTML = engineer.engineerHTML(engineerArr, i);
             engineerStr += engineersHTML;
-            console.log(engineerStr);
         }
+        // concatenate the entire row of engineers
         engineerOutput = rowBeginningOutput.concat(engineerStr + rowEndOutput);
     }
 
-    // intren HTML
+    // intren HTML, create output if array has at least one element
     if (internArr[0]) {
         let internStr = "";
         for (j = 0; j < internArr.length; j++) {
             let internsHTML = intern.internHTML(internArr, j);
             internStr += internsHTML;
-            console.log(internStr);
         }
+        // concatenate the entire row of interns
         internOutput = rowBeginningOutput.concat(internStr + rowEndOutput);
     }
 
     // concatenate all parts of the final HTML and push to output var
     await output.push(beginnningOutput + managerOutput + engineerOutput + internOutput + endOutput);
 
-    await fs.appendFile(`./output/${teamName}.html`, output, function (err) {
+    // write in an HTML file with team's name
+    await fs.writeFile(`./output/${teamName}.html`, output, function (err) {
         if (err) throw err;
         console.log("HTML complete");
     })
