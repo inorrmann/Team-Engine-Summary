@@ -35,6 +35,8 @@ const emailValidation = (email) => {
     const characterDot = (emailArr) => {
         return emailArr === ".";
     };
+    // check if there is at least one character in the array that matches
+    // the specified characters (i.e., characterAt and characterDot)
     if (emailArr.some(characterAt) && emailArr.some(characterDot)) {
         return true;
     }
@@ -42,6 +44,7 @@ const emailValidation = (email) => {
         return "Please enter a valid email address";
     }
 };
+
 
 const answerValidation = (input) => {
     if (input === "") {

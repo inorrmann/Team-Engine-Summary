@@ -17,4 +17,8 @@ For all employees:
 ![team profile 1](./Assets/Team-Profile-1.png)
 ![team profile 2](./Assets/Team-Profile-2.png)
 
+## Technologies used
+
+Jest (testing) - HTML - CSS - Bootstrap - Javascript - Inquirer
+
 
