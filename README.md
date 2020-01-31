@@ -1,9 +1,9 @@
-# Team-Engine-Summary
+# Team Summary
 
 ![language badge](https://img.shields.io/github/languages/top/inorrmann/Team-Engine-Summary)
 [![npm version](https://badge.fury.io/js/inquirer.svg)](https://badge.fury.io/js/inquirer)
 
-This command line application builds a team of software enginners in HTML. The user can input the following information:
+This command line application builds a team of software engineers in HTML. The user can input the following information:
 For all employees:
 
 * name
